@@ -21,7 +21,11 @@ void Hal_uart_init(void)
     Uart->uartcr.bits.TXE = 1;
     Uart->uartcr.bits.RXE = 1;
     Uart->uartcr.bits.UARTEN = 1;
-    
+
+    // Enable input interrupt
+    Uart->uartimsc.bits.RXIM = 1;
+
+    // Register UART interrupt handler
     Hal_interrupt_enable(UART_INTERRUPT0);
     Hal_interrupt_register_handler(interrupt_handler, UART_INTERRUPT0);
 }
@@ -34,22 +38,25 @@ void Hal_uart_put_char(uint8_t ch)
 
 uint8_t Hal_uart_get_char(void)
 {
-	uint32_t data;
+    uint32_t data;
 
-	while(Uart->uartfr.bits.RXFE);
+    while(Uart->uartfr.bits.RXFE);
 
-	data = Uart->uartdr.all;
+    data = Uart->uartdr.all;
 
-	if(data & 0xFFFFFF00)
-	{
-		Uart->uartrsr.all = 0xFF;
-		return 0;	
-	}	
-	return (uint8_t)(data & 0xFF);
+    // Check for an error flag
+    if (data & 0xFFFFFF00)
+    {
+        // Clear the error
+        Uart->uartrsr.all = 0xFF;
+        return 0;
+    }
+
+    return (uint8_t)(data & 0xFF);
 }
 
-void interrupt_handler(void)
+static void interrupt_handler(void)
 {
-	int8_t ch = Hal_uart_get_char(void);
-	Hal_uart_put_char(ch);
+    uint8_t ch = Hal_uart_get_char();
+    Hal_uart_put_char(ch);
 }
