@@ -1,0 +1,6 @@
+*.o
+*.os
+*.ld
+*.bin
+*.map
+*.axf
