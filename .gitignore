@@ -4,4 +4,4 @@
 *.bin
 *.map
 *.axf
-build
+build/
