@@ -104,19 +104,27 @@ static void Timer_test(void)
 void User_task0(void)
 {
     uint32_t local = 0;
+    debug_printf("User Task #0 SP=0x%x\n", &local);
 
     while(true)
     {
-    	debug_printf("User Task #0 SP=0x%x\n", &local);
-        KernelEventFlag_t handle_event = Kernel_wait_events(KernelEventFlag_UartIn);
-        switch(handle_event)
-        {
-        case KernelEventFlag_UartIn:
-            debug_printf("\nEvent handled by Task0\n");
-	    Kernel_send_events(KernelEventFlag_CmdIn);
-            break;
-        }
-
+	bool pendingEvent = true;
+	while(pendingEvent)
+	{
+		KernelEventFlag_t handle_event = Kernel_wait_events(KernelEventFlag_UartIn | KernelEventFlag_CmdOut);
+		switch(handle_event)
+		{
+		case KernelEventFlag_UartIn:
+			debug_printf("\nUartIn handled by Task0\n");
+			break;
+		case KernelEventFlag_CmdOut:
+			debug_printf("\nCmdOut handeld by Task0\n");
+			break;
+		default :
+			pendingEvent = false;
+			break;
+		}
+	}
 	delay(1000);
         Kernel_yield();
     }
@@ -125,10 +133,10 @@ void User_task0(void)
 void User_task1(void)
 {
     uint32_t local = 0;
+    debug_printf("User Task #1 SP=0x%x\n", &local);
 
     while(true)
     {
-    	debug_printf("User Task #1 SP=0x%x\n", &local);
 	KernelEventFlag_t handle_event = Kernel_wait_events(KernelEventFlag_CmdIn);
 	switch(handle_event)
 	{
@@ -144,10 +152,10 @@ void User_task1(void)
 void User_task2(void)
 {
     uint32_t local = 0;
+    debug_printf("User Task #2 SP=0x%x\n", &local);
 
     while(true)
     {
-    	debug_printf("User Task #2 SP=0x%x\n", &local);
 
 	delay(1000);
         Kernel_yield();
