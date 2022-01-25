@@ -112,7 +112,8 @@ void User_task0(void)
         switch(handle_event)
         {
         case KernelEventFlag_UartIn:
-            debug_printf("\nEvent handled\n");
+            debug_printf("\nEvent handled by Task0\n");
+	    Kernel_send_events(KernelEventFlag_CmdIn);
             break;
         }
 
@@ -128,7 +129,13 @@ void User_task1(void)
     while(true)
     {
     	debug_printf("User Task #1 SP=0x%x\n", &local);
-
+	KernelEventFlag_t handle_event = Kernel_wait_events(KernelEventFlag_CmdIn);
+	switch(handle_event)
+	{
+	case KernelEventFlag_CmdIn :
+		debug_printf("\nEvent handeld by Task1\n");
+		break;
+	}
 	delay(1000);
         Kernel_yield();
     }
