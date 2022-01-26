@@ -80,7 +80,7 @@ uint32_t Kernel_recv_msg(KernelMsgQ_t Qname, void* out_data, uint32_t count)
     
     for(uint32_t i = 0 ; i < count ; i++)
     {
-	if(false == Kernel_msgQ_dequeue(Qname, &d))
+	if(false == Kernel_msgQ_dequeue(Qname, d))
 	{
 	    return i;
 	}
