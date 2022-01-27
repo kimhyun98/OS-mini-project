@@ -88,3 +88,16 @@ uint32_t Kernel_recv_msg(KernelMsgQ_t Qname, void* out_data, uint32_t count)
     }
     return count;
 }
+
+void Kernel_lock_sem(void)
+{
+    if(false == Kernel_sem_test())
+    {
+	Kernel_yield();
+    }
+}
+
+void Kernel_unlock_sem(void)
+{
+    Kernel_sem_release();
+}
